@@ -1,0 +1,237 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: MoneyTransfer API
+  contact:
+    name: Fredrik Mäkilä
+
+tags:
+  - name: Accounts
+    description: Account operations
+
+  - name: Transactions
+    description: Transaction operations
+
+paths:
+  /accounts:
+    get:
+      summary: Get all accounts
+      description: Get all active accounts that has been created in the system.
+      operationId: getAccounts
+      tags:
+        - Accounts
+      responses:
+        '200':
+          description: A list of accounts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+
+  /accounts/{id}:
+    get:
+      summary: Get account by id
+      description: Get account by id.
+      operationId: getAccountById
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Gets account with matching id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Updates an account
+      description: Updates the account.
+      operationId: updateAccountById
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: The updated account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Deletes an account
+      description: Marks the account as inactive.
+      operationId: deleteAccountById
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: The deleted account
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/Account'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /transactions:
+    get:
+      summary: Lists all transactions
+      description: Lists all transactions that has ever been made in the system.
+      operationId: getTransactions
+      tags:
+        - Transactions
+      responses:
+        '200':
+          description: A list of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+    post:
+      summary: Create transaction between two accounts
+      description: Creates a money transfer between two accounts, transferring money from source to target account.
+      operationId: createTransaction
+      tags:
+        - Transactions
+      responses:
+        '200':
+          description: The transaction receipt containing the updated balance of source and target accounts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/InsufficientFunds'
+        '500':
+          $ref: '#/components/responses/UnexpectedAccountUpdate'
+
+  /transactions/{id}:
+    get:
+      summary: Get transaction by id
+      description: Get transaction by id.
+      operationId: getTransactionById
+      tags:
+        - Transactions
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: A transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+components:
+  parameters:
+    idParam:
+      in: path
+      required: true
+      name: id
+      schema:
+        type: string
+        format: uuid
+        example: '720fa221-b197-4c3c-8436-0b86b1e05da4'
+      description: Unique identifier of resource
+
+  schemas:
+    Account:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Account is active or inactive. An inactive account is an account marked for deletion.
+        balance:
+          type: number
+          example: 235813.21
+          description: Current account balance
+        created_at:
+          type: string
+          format: date-time
+          example: '2019-11-30 17:58:07'
+          description: Account creation date
+        id:
+          type: string
+          format: uuid
+          example: '720fa221-b197-4c3c-8436-0b86b1e05da4'
+          description: Unique identifier
+        name:
+          type: string
+          example: 'My MoneyTransfer Account'
+          description: Name of account
+
+    Transaction:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 23711.13
+          description: Amount transferred from source account to target account
+        created_at:
+          type: string
+          format: date-time
+          example: '2019-11-30 17:58:07'
+          description: Transaction creation date
+        id:
+          type: string
+          format: uuid
+          example: '720fa221-b197-4c3c-8436-0b86b1e05da4'
+          description: Unique identifier
+        source_account:
+          $ref: '#/components/schemas/Account'
+          description: Account transferred money from
+        target_account:
+          $ref: '#/components/schemas/Account'
+          description: Account transferred money to
+
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+  responses:
+      NotFound:
+        description: The specified resource was not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+      InsufficientFunds:
+        description: The account balance of the source account is insufficient for the requested transaction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+      UnexpectedAccountUpdate:
+        description: An unexpected error has occurred during account balance update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+
+
+

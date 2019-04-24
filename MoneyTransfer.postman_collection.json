@@ -1,0 +1,554 @@
+{
+	"info": {
+		"_postman_id": "cc595966-18fd-4a43-9f08-3ecd41e0c484",
+		"name": "MoneyTransfer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "transactions",
+			"item": [
+				{
+					"name": "Transfer Funds Between Accounts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bbf6a1c3-e507-4809-bd5d-92d1d5063f0c",
+								"exec": [
+									"const createAccount = eval(globals.createAccount);",
+									"const updateAccount = eval(globals.updateAccount);",
+									"    ",
+									"createAccount(account => {",
+									"    updateAccount(() => { }, account.id, null, 500);",
+									"    pm.environment.set(\"source_account_id\", account.id)",
+									"});",
+									"createAccount(account => pm.environment.set(\"target_account_id\", account.id));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2134cafb-0540-466d-b8bf-d7bbc8f224a5",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"New balance of source account should be 200\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.source_account.balance).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"New balance of target account should be 300\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.target_account.balance).to.eql(300);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"source_account_id\": \"{{source_account_id}}\",\n\t\"target_account_id\": \"{{target_account_id}}\",\n\t\"amount\": 300\n}"
+						},
+						"url": {
+							"raw": "localhost:8000/transactions",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction By ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9023d07e-ccf1-4cbb-b719-95b7e42b1bea",
+								"exec": [
+									"const createAccount = eval(globals.createAccount);",
+									"const createTransaction = eval(globals.createTransaction);",
+									"",
+									"createAccount(account => pm.environment.set(\"source_account_id\", account.id));",
+									"createAccount(account => pm.environment.set(\"target_account_id\", account.id));",
+									"",
+									"createTransaction(",
+									"    transaction => pm.environment.set(\"id\", transaction.id),",
+									"    pm.environment.get(\"source_account_id\"),",
+									"    pm.environment.get(\"target_account_id\"),",
+									"    0);",
+									"",
+									"",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4f1fcbf-9355-4411-8db0-e5eb7581a6de",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/transactions/{{id}}",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"transactions",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Transactions",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0005d2eb-afa2-4e61-a47e-d13ac5ea766c",
+								"exec": [
+									"const createAccount = eval(globals.createAccount);",
+									"const createTransaction = eval(globals.createTransaction);",
+									"",
+									"createAccount(account => pm.environment.set(\"source_account_id\", account.id));",
+									"createAccount(account => pm.environment.set(\"target_account_id\", account.id));",
+									"",
+									"createTransaction(",
+									"    () => {},",
+									"    pm.environment.get(\"source_account_id\"),",
+									"    pm.environment.get(\"target_account_id\"),",
+									"    0);",
+									"",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa885ad4-2f34-442c-b0da-cc43684ca026",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/transactions",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1827bd6d-65fa-4148-b05b-0c0fae566312",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f95f2777-6448-4f7e-9904-94cadbb7940b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Test account\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/accounts",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Account By ID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c228e69b-f582-4023-b771-7c2823c79d19",
+						"exec": [
+							"const createAccount = eval(globals.createAccount);",
+							"createAccount(account => pm.environment.set(\"id\", account.id));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c59f3bfe-9f63-47bb-a2ee-8f6fce029e52",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/accounts/{{id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"accounts",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Accounts",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b1224b99-e802-4eb9-a99d-bd748b0e4c77",
+						"exec": [
+							"const createAccount = eval(globals.createAccount);",
+							"    ",
+							"createAccount(() => {})",
+							"createAccount(() => {})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "28b30427-931f-4898-bdd1-b2c16ef14815",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/accounts",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Account By ID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7a9d6c63-1983-4473-9159-0b62ba410d70",
+						"exec": [
+							"const createAccount = eval(globals.createAccount);",
+							"    ",
+							"createAccount(account => pm.environment.set(\"id\", account.id));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "a9c5829a-82db-4e09-9785-063d331ea77a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Should set active to false for account\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.active).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/accounts/{{id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"accounts",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Account By ID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5e71cbb7-5112-49e7-8ed1-9543672bf4bb",
+						"exec": [
+							"const createAccount = eval(globals.createAccount);",
+							"    ",
+							"createAccount(account => pm.environment.set(\"id\", account.id));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4ac526e0-0af4-4544-8716-beeaa39bc80f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Should have updated name\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql(\"Updated name\");",
+							"});",
+							"",
+							"pm.test(\"Should have updated balance\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.balance).to.eql(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Updated name\",\n\t\"balance\": 1000\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/accounts/{{id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"accounts",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "803dac54-7bc6-4932-a838-e18ea0027eb5",
+				"type": "text/javascript",
+				"exec": [
+					"const createAccount = callback => ",
+					"    pm.sendRequest({",
+					"        url: 'localhost:8000/accounts',",
+					"        method: 'POST',",
+					"        header: { 'content-type': 'application/json' },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({ ",
+					"                name: 'test'",
+					"            })",
+					"        }  ",
+					"    }, function (err, res) {",
+					"        callback(res.json());",
+					"    });",
+					"    ",
+					"const updateAccount = (callback, id, name, balance) => ",
+					"    pm.sendRequest({",
+					"        url: 'localhost:8000/accounts/' + id,",
+					"        method: 'PATCH',",
+					"        header: { 'content-type': 'application/json' },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({ name, balance })",
+					"        }  ",
+					"    }, function (err, res) {",
+					"        callback(res.json());",
+					"    });",
+					"    ",
+					"const createTransaction = (callback, source_account_id, target_account_id, amount) => ",
+					"    pm.sendRequest({",
+					"        url: 'localhost:8000/transactions',",
+					"        method: 'POST',",
+					"        header: { 'content-type': 'application/json' },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({ source_account_id, target_account_id, amount })",
+					"        }  ",
+					"    }, function (err, res) {",
+					"        callback(res.json());",
+					"    });",
+					"    ",
+					"postman.setGlobalVariable('createAccount', createAccount);",
+					"postman.setGlobalVariable('updateAccount', updateAccount);",
+					"postman.setGlobalVariable('createTransaction', createTransaction);",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d5c08e4d-43aa-44de-aace-9db7f4b85f3c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
